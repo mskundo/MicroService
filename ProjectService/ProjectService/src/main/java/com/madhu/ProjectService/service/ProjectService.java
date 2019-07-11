@@ -1,12 +1,16 @@
 package com.madhu.ProjectService.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import com.madhu.ProjectService.entity.Project;
 import com.madhu.ProjectService.model.ProjectRecord;
@@ -20,6 +24,11 @@ public class ProjectService {
 
 	@Autowired
 	private ProjectRepository projectRepository;
+	
+	@Autowired
+	private RestTemplate restTemplate;
+	
+	private static String SERVICE = "http://user-service/projectmanager/user/getuser/";
 
 	public ProjectRecord saveProject(ProjectRecord projectRecord) {
 		try {
@@ -72,16 +81,25 @@ public class ProjectService {
 		}
 	}
 
-	public String getProjectName(Long projectId) {
-		try {
-			logger.info("getting project name from project table");
-			String projectName = projectRepository.getProjectName(projectId);
-			return projectName;
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Exception occurred while getting project name from project table",
-					e.getMessage());
-			throw e;
+	public List<ProjectRecord> findProjects() {
+		
+		List<Project> projects=projectRepository.findAll();
+		List<ProjectRecord> plist=new ArrayList<ProjectRecord>();
+		for(Project p:projects){
+			ProjectRecord p1=new ProjectRecord();
+			p1.setProjectId(p.getProjectId());
+			p1.setProjectName(p.getProjectName());
+			p1.setStartDate(p.getStartDate());
+			p1.setEndDate(p.getEndDate());
+			p1.setPriority(p.getPriority());
+			p1.setUserId(p.getUserId());
+			String response = restTemplate.exchange(SERVICE+p.getUserId() , HttpMethod.GET, null,
+					 new ParameterizedTypeReference<String>() {
+					 }).getBody();
+			p1.setUserData(response);
+			plist.add(p1);
 		}
+		return plist;
 	}
 
 }

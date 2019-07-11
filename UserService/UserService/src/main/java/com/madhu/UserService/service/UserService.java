@@ -68,16 +68,8 @@ public class UserService {
 		}
 	}
 
-	public String getUserName(Long userId) {
-		try {
-			logger.info("getting user name from user table");
-			String result = userRepository.getFullName(userId);
-			result = result.replaceAll(",", " ");
-			return result;
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Exception occurred while getting user name from user table", e.getMessage());
-			throw e;
-		}
+	public List<User> getUser(Long id) {
+		return userRepository.findUser(id);
 	}
 
 }

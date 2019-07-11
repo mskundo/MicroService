@@ -11,7 +11,15 @@ public class ProjectRecord {
 	public int priority;
 	public Long userId;
 	public String userName;
+	public String userData;
 	
+	
+	public String getUserData() {
+		return userData;
+	}
+	public void setUserData(String userData) {
+		this.userData = userData;
+	}
 	public String getUserName() {
 		return userName;
 	}
